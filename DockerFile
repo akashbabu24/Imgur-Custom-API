@@ -1,8 +1,0 @@
-FROM ubuntu:latest
-MAINTAINER Akash Babu "akashbabu24@yahoo.co.in"
-RUN apt-get update -y
-RUN apt-get install -y python-pip python-dev build-essential flask imgur
-COPY . /app
-WORKDIR /app
-ENTRYPOINT ["python"]
-CMD ["upload.py"]
