@@ -14,6 +14,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.options import Options
 
 def authenticate():
 	# Get client ID and secret from auth.ini
@@ -32,7 +33,9 @@ def authenticate():
 	authorization_url = client.get_auth_url('pin')
 
 	#selenium automation of logon to imgur and retrieval of PIN
-	driver = webdriver.Firefox()
+	options = Options()
+        options.headless = True
+        driver = webdriver.Firefox(options=options)
 	driver.get(authorization_url)
 	username = driver.find_element_by_xpath('//*[@id="username"]')
 	password = driver.find_element_by_xpath('//*[@id="password"]')
