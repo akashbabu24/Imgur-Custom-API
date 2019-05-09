@@ -26,4 +26,4 @@ RUN tar -xvzf geckodriver-v0.24.0-linux64.tar.gz -O > /usr/bin/geckodriver
 RUN chmod +x /usr/bin/geckodriver
 ENTRYPOINT ["python"]
 CMD ["upload.py"]
-EXPOSE 80/tcp
+EXPOSE 8080/tcp
