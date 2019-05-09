@@ -18,7 +18,7 @@ from subprocess import call
 import string
 from random import *
 import datetime
-from queue import Queue
+import Queue
 from threading import Thread
 import logging
 
@@ -29,7 +29,7 @@ job_details = {}
 completed = {}
 pending = {}
 failed = {}
-q = Queue(maxsize=0)
+q = Queue.Queue(maxsize=0)
 
 #image upload api
 @app.route('/v1/images/upload', methods=['POST'])
@@ -78,8 +78,8 @@ def crawl(q, job_id, client):
 		#get image url from queue and download to local. Upload the download image
 		while not q.empty():
 			work = q.get()                      #fetch new work from the Queue
-			call('curl '+str(work)+' --output downloaded/image_to_be_uploaded', shell=True)
-			image_path = 'downloaded/image_to_be_uploaded'
+			call('curl '+str(work)+' --output image_to_be_uploaded', shell=True)
+			image_path = 'image_to_be_uploaded'
 			try:
 				client.upload_from_path(image_path, anon=False)
 				completed.get(job_id).get("urls").append(work)
