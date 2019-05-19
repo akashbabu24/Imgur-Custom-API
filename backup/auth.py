@@ -16,6 +16,11 @@ from selenium.webdriver.common.by import By
 #from selenium.webdriver.firefox.options import Options
 from pyvirtualdisplay import Display
 
+#class auth:
+#def __init__(self):
+		# Get client ID and secret from auth.ini
+		#config = get_config()
+		#config.read('auth.ini')
 def authenticate():
 		#credentials from auth.ini file
 		config = get_config()
@@ -31,6 +36,9 @@ def authenticate():
 		authorization_url = client.get_auth_url('pin')
 
 		#selenium automation of logon to imgur and retrieval of PIN
+		#options = Options()
+		#options.headless = True
+		#driver = webdriver.Firefox(options=options)
 		display = Display(visible=0, size=(800, 600))
 		display.start()
 		driver = webdriver.PhantomJS()

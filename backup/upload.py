@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 
+'''
+	Here's how you upload an image. For this example, put the cutest picture
+	of a kitten you can find in this script's folder and name it 'Kitten.jpg'
+
+	For more details about images and the API see here:
+		https://api.imgur.com/endpoints/image
+'''
+
 # Pull authentication from the auth example (see auth.py)
 from auth import authenticate
+#import auth
 from datetime import datetime
 from flask import Flask, request
 import json
@@ -15,7 +24,7 @@ from threading import Thread
 import logging
 
 app = Flask(__name__)
-album = None
+album = 'album1' # You can also enter an album ID here
 characters = string.ascii_letters + string.digits
 job_details = {}
 completed = {}
@@ -28,7 +37,10 @@ q = Queue.Queue(maxsize=0)
 def post():
 		imgUrls = []
 		imgUrls = request.json['urls']
+		print(imgUrls)
 		job_id =  "".join(choice(characters) for x in range(randint(16, 16)))
+		#return job_id+"\n"
+                #print("job id created: "+job_id)
 		status = "pending"
 		finished = "null"
 		job_created = datetime.datetime.utcnow().isoformat()
@@ -45,6 +57,7 @@ def post():
 			q.put(imgUrls[i])
 
 		#client authentication to imgur
+		#client = auth()
                 client = authenticate()
 
 		#Initiating threads for each image upload
@@ -61,7 +74,7 @@ def post():
 		#job finish time
 		job_completed = datetime.datetime.utcnow().isoformat()
 		job_details.get(job_id).update({"finished" : job_completed})
-                return json.dumps({"job_id" : job_id})+"\n"
+                return job_id+"\n"
 
 def crawl(q, job_id, client):
 		#get image url from queue and download to local. Upload the download image
@@ -69,8 +82,12 @@ def crawl(q, job_id, client):
 			work = q.get()                      #fetch new work from the Queue
 			call('curl '+str(work)+' --output image_to_be_uploaded', shell=True)
 			image_path = 'image_to_be_uploaded'
+			config = {
+		        'album': album
+		        #'description': 'an image uploaded at {0}'.format(datetime.now())
+                	}               
                         try:
-				client.upload_from_path(image_path, anon=False)
+				client.upload_from_path(image_path, config=config, anon=True)
 				completed.get(job_id).get("urls").append(work)
 			except Exception as e:
 				logging.error(e, exc_info=True)
@@ -101,8 +118,12 @@ def get(jobId):
 #to receive all images on the account
 @app.route('/v1/images', methods=['GET'])
 def get_all():
+	#client = auth()
         client = authenticate()
 	images = []
+#	for album1 in client.get_account_albums('me'):
+		#for image in client.get_album_images(album1.id):
+        #for image in client.get_album_images(None):
         config = get_config()
         config.read('auth.ini')
 
@@ -110,7 +131,7 @@ def get_all():
         img_username = config.get('credentials', 'imgur_username')
         for image in client.get_account_images(img_username, page=0):
             images.append(image.link)
-	return json.dumps({"uploaded" : images})+"\n"
+	return json.dumps({"images" : images})+"\n"
 
 # If you want to run this as a standalone script
 if __name__ == "__main__":
